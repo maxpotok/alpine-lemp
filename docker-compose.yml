@@ -1,0 +1,24 @@
+version: "3.3"
+services:
+  nginx:
+    build:
+      dockerfile: ./nginx/Dockerfile
+      context: .
+    container_name: nginx
+    ports:
+      - "80:80"
+  mysql:
+    build:
+      dockerfile: ./db/Dockerfile
+      context: .
+    image: mysql:3.13
+    container_name: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=toor
+      - MYSQL_USER=foo
+      - MYSQL_PASSWORD=bar
+      - MYSQL_DATABASE=admin
+    volumes:
+      - .:/app
+    ports:
+      - "3306:3306"
