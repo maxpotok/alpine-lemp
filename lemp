@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+
+Help() {
+    echo
+    echo "Alpine LEMP stack by Max Potok"
+    echo
+    echo "Synthax: lemp [start|stop|kill|list|help|]"
+    echo
+    echo "options:"
+    echo "start | -s        start all containers"
+    echo "stop  | -p        stop all containers"
+    echo "kill  | -k        stop exact container"
+    echo "list  | -l        list all running containers"
+    echo "help  | -h        help menu"
+    echo "bin   | -b        create binary executable"
+    echo "nginx | -n        run nginx container"
+    echo "mysql | -m        run mysql container"
+    echo
+}
+
+Start() {
+    docker-compose up
+}
+
+Stop() {
+    docker stop $(docker ps -aq)
+}
+
+Kill() {
+    docker stop $2
+}
+
+List() {
+    docker ps
+}
+
+Bin() {
+    ln -s /$(pwd)/lemp /usr/bin/lemp
+}
+
+Nginx() {
+    cd nginx
+    docker build -t nginx . 
+    docker run -dit --name nginx -p 80:80 nginx
+}
+
+MySQL() {
+    cd db
+    docker build -t mysql .
+    docker run -dit --name mysql -p 3306:3306 mysql
+}
+
+while getopts s:p:k:l:h:b:n:m option
+do
+    case $option in
+        s)
+        Start
+        exit;;
+        p)
+        Stop
+        exit;;
+        k)
+        Kill
+        exit;;
+        l)
+        List
+        exit;;
+        h)
+        Help
+        exit;;
+        b)
+        Bin
+        exit;;
+        n)
+        Nginx
+        exit;;
+        m)
+        MySQL
+        exit;;
+        \?)
+        echo "Error: Invalid option"
+        exit;;
+    esac
+done
+
+if [ $# -eq 0 ]
+    then
+        Help
+    else
+        if [ $1 == "start" ];
+        then
+            Start
+        elif [ $1 == "stop" ];
+        then
+            Stop
+        elif [ $1 == "kill" ];
+        then
+            Kill
+        elif [ $1 == "list" ];
+        then
+            List
+        elif [ $1 == "bin" ];
+        then
+            Bin
+        elif [ $1 == "nginx" ];
+        then
+            Nginx
+        elif [ $1 == "mysql" ];
+        then
+            MySQL
+        else
+            Help
+        fi
+fi
